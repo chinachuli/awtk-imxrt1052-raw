@@ -1,0 +1,9 @@
+#rt105x
+*.pbd
+*.linf
+*.browse
+*.tmp
+*.pbd
+*.pbd.browse
+/awtk_project/iar/awtk_gui_demo/Obj
+

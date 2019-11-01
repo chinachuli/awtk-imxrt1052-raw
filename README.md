@@ -12,6 +12,7 @@
 
 ```
 git clone https://github.com/chinachuli/awtk-imxrt1052-raw.git
+git clone https://gitee.com/chinachuli/awtk-imxrt1052-raw.git(镜像)
 ```
 
 2. 用IAR打开awtk_project/iar/awtk_gui_demo.eww

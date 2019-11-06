@@ -1,4 +1,4 @@
-
+﻿
 /**
  * File:   awtk_config.h
  * Author: AWTK Develop Team
@@ -17,7 +17,6 @@
  * History:
  * ================================================================
  * 2018-09-12 Li XianJing <xianjimli@hotmail.com> created
- *
  */
 
 #ifndef AWTK_CONFIG_H
@@ -60,16 +59,16 @@
 #define WITH_BITMAP_BGR565 1
 
 /**
- * 如果FLASH空间较小，不足以放大字体文件时，请定义本宏
+ * 如果有优化版本的memcpy函数，请定义本宏
  *
  */
-#define WITH_MINI_FONT 1
+#define HAS_FAST_MEMCPY 1
 
 /**
- * 如果启用STM32 G2D硬件加速，请定义本宏
+ * 如果系统有标准的malloc函数，请定义本宏
  *
  */
-//#define WITH_STM32_G2D 1
+#define HAS_STD_MALLOC 1
 
 /**
  * 如果启用VGCANVAS，而且没有OpenGL硬件加速，请定义本宏
@@ -77,22 +76,5 @@
  */
 #define WITH_NANOVG_AGGE 1
 
-/**
- * 如果启用VGCANVAS，请定义本宏
- *
- */
-#define WITH_VGCANVAS 1
-
-/**
- * 如果系统有标准的malloc函数，请定义本宏
- *
- */
-//#define HAS_STD_MALLOC 1
-
-/**
- * 如果启用竖屏，请定义本宏
- *
- */
-//#define WITH_LCD_PORTRAIT 1
 
 #endif/*AWTK_CONFIG_H*/

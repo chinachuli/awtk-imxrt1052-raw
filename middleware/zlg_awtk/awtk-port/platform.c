@@ -19,7 +19,6 @@
  *
  */
 
-//#include "delay.h"
 #include "tkc/mem.h"
 #include "base/timer.h"
 #include "tkc/platform.h"
@@ -34,10 +33,8 @@ void sleep_ms(uint32_t ms) {
   delay_ms(ms);
 }
 
-//#define MEM2_MAX_SIZE 8 * 1024 * 1024
-//#define MEM2_ADDR (uint8_t*)0XC0000000 + 2 * 2 * 480 * 800
 
 ret_t platform_prepare(void) {
- // tk_mem_init(MEM2_ADDR, MEM2_MAX_SIZE);
+
   return RET_OK;
 }

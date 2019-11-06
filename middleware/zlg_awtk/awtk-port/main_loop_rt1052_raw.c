@@ -24,7 +24,6 @@
 #include "base/idle.h"
 #include "base/timer.h"
 #include "main_loop/main_loop_simple.h"
-
 #include "bsp_i2c_touch.h"
 
 extern int32_t TP_X,TP_Y;
@@ -42,12 +41,10 @@ uint8_t platform_disaptch_input(main_loop_t* loop) {
   return 0;
 }
 
-//extern lcd_t* stm32f767_create_lcd(wh_t w, wh_t h);
 
 extern lcd_t* rt1052_create_lcd(wh_t w, wh_t h);
 
 lcd_t* platform_create_lcd(wh_t w, wh_t h) {
- // return stm32f767_create_lcd(w, h);
   return rt1052_create_lcd(w, h);
 }
 

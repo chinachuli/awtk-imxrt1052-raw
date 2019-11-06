@@ -230,9 +230,7 @@
                     <state>PRINTF_ADVANCED_ENABLE=1</state>
                     <state>SCANF_ADVANCED_ENABLE=1</state>
                     <state>SKIP_SYSCLK_INIT</state>
-                    <state>HAS_STD_MALLOC</state>
                     <state>HAS_AWTK_CONFIG</state>
-                    <state>HAS_FAST_MEMCPY</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -2052,29 +2050,14 @@
         <group>
             <name>awtk-port</name>
             <file>
-                <name>$PROJ_DIR$\..\..\middleware\zlg_awtk\awtk-port\fs_os.c</name>
-                <excluded>
-                    <configuration>awtk_gui_demo</configuration>
-                </excluded>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\..\middleware\zlg_awtk\awtk-port\main_loop_rt1052_raw.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\middleware\zlg_awtk\awtk-port\mutex.c</name>
+                <name>$PROJ_DIR$\..\..\middleware\zlg_awtk\awtk-port\mutex_null.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\middleware\zlg_awtk\awtk-port\platform.c</name>
             </file>
-        </group>
-        <group>
-            <name>pxp</name>
-            <excluded>
-                <configuration>awtk_gui_demo</configuration>
-            </excluded>
-            <group>
-                <name>driver\pxp</name>
-            </group>
         </group>
     </group>
     <group>

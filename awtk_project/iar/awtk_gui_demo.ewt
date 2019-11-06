@@ -2171,23 +2171,14 @@
         <group>
             <name>awtk-port</name>
             <file>
-                <name>$PROJ_DIR$\..\..\middleware\zlg_awtk\awtk-port\fs_os.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\..\middleware\zlg_awtk\awtk-port\main_loop_rt1052_raw.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\middleware\zlg_awtk\awtk-port\mutex.c</name>
+                <name>$PROJ_DIR$\..\..\middleware\zlg_awtk\awtk-port\mutex_null.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\middleware\zlg_awtk\awtk-port\platform.c</name>
             </file>
-        </group>
-        <group>
-            <name>pxp</name>
-            <group>
-                <name>driver\pxp</name>
-            </group>
         </group>
     </group>
     <group>

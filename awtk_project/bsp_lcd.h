@@ -146,7 +146,7 @@ enum
  * 全局变量声明
  ******************************************************************************/
 extern volatile bool s_frameDone;
-extern pixel_t s_psBufferLcd[2][LCD_PIXEL_HEIGHT][LCD_PIXEL_WIDTH];
+extern pixel_t s_psBufferLcd[3][LCD_PIXEL_HEIGHT][LCD_PIXEL_WIDTH];
 
 /*******************************************************************************
  * 函数声明

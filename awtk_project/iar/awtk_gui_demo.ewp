@@ -2046,6 +2046,12 @@
             <file>
                 <name>$PROJ_DIR$\..\..\middleware\zlg_awtk\awtk-demos\demo_ui_app.c</name>
             </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\middleware\zlg_awtk\awtk-demos\demo_vg_app.c</name>
+                <excluded>
+                    <configuration>awtk_gui_demo</configuration>
+                </excluded>
+            </file>
         </group>
         <group>
             <name>awtk-port</name>

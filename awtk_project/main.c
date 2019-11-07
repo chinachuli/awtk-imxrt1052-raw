@@ -142,7 +142,7 @@ int main(void)
     BOARD_InitSemcPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
-    fLCD_Init(LCD_INTERRUPT_DISABLE);
+    fLCD_Init(LCD_INTERRUPT_ENABLE);
     GTP_Init_Panel();
     SysTick_Init();
     memset(s_psBufferLcd, 0, sizeof(s_psBufferLcd));

@@ -2355,6 +2355,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\devices\MIMXRT1052\drivers\fsl_usdhc.c</name>
+            <excluded>
+                <configuration>awtk_gui_demo</configuration>
+            </excluded>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\devices\MIMXRT1052\drivers\fsl_wdog.c</name>

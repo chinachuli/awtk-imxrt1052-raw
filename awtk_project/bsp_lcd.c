@@ -48,10 +48,8 @@ __IO uint32_t s_frame_count = 0;
 /* 显存 */
 AT_NONCACHEABLE_SECTION_ALIGN( pixel_t s_psBufferLcd[3][LCD_PIXEL_HEIGHT][LCD_PIXEL_WIDTH], FRAME_BUFFER_ALIGN);
 
-/*用于存储当前选择的字体格式*/
-/* 用于存储当前字体颜色和字体背景颜色的变量*/
-static pixel_t CurrentTextColor   = CL_WHITE;
-static pixel_t CurrentBackColor   = CL_BLACK;
+
+
 
 /* 指向当前的显存，由于是地址，所以用32位变量 */
 static uint32_t CurrentFrameBuffer = (uint32_t)s_psBufferLcd[0];
@@ -282,6 +280,7 @@ void LCD_BackLight_ON(void)
 }
 */
 
+
 /**
 * @brief  初始化液晶屏
 * @param  enableInterrupt ：是否使能中断
@@ -340,12 +339,11 @@ void LCD_InterruptConfig(void)
    
   /* 配置ELCDIF为CurFrameDoneInterrupt中断 */
   ELCDIF_EnableInterrupts(LCDIF, kELCDIF_CurFrameDoneInterruptEnable);
+  
 }
 
 static uint8_t* next_fb = NULL;
 static uint8_t* online_fb = NULL;
-static uint8_t* offline_fb = NULL;
-static uint8_t* swap_next_fb = NULL;
 
 //以下为AWTK中的移植
 ret_t lcd_rt1052_begin_frame(lcd_t* lcd, rect_t* dirty_rect) {
@@ -359,6 +357,7 @@ ret_t lcd_rt1052_begin_frame(lcd_t* lcd, rect_t* dirty_rect) {
     mem->online_fb = NULL;
     mem->offline_fb = NULL;
     
+    
     for (i = 0; i < ARRAY_SIZE(s_psBufferLcd); i++) {
       uint8_t* iter = (uint8_t*)s_psBufferLcd[i];
       if (iter != online_fb && iter != next_fb) {
@@ -366,6 +365,8 @@ ret_t lcd_rt1052_begin_frame(lcd_t* lcd, rect_t* dirty_rect) {
         break;
       }
     }
+    
+      s_frame_count++;
     
   }
 
@@ -375,8 +376,11 @@ ret_t lcd_rt1052_begin_frame(lcd_t* lcd, rect_t* dirty_rect) {
 ret_t lcd_rt1052_swap(lcd_t* lcd) {
   lcd_mem_t* mem = (lcd_mem_t*)lcd;
 
-  next_fb = mem->offline_fb;
-  
+  if(next_fb==NULL){
+     next_fb = mem->offline_fb;
+     ELCDIF_SetNextBufferAddr(LCDIF, (uint32_t)next_fb);
+  }
+
   return RET_OK;
 }
 
@@ -384,12 +388,17 @@ ret_t lcd_rt1052_swap(lcd_t* lcd) {
 lcd_t* rt1052_create_lcd(wh_t w, wh_t h) {
   lcd_t* lcd = NULL;
 
-                                                                //lcd_mem_create_three_fb(w, h, online_fb, offline_fb, next_fb);
+#ifdef USE_THREE_FB
   lcd = lcd_mem_bgr565_create_three_fb(w, h, (uint8_t*)s_psBufferLcd[0], (uint8_t*)s_psBufferLcd[1], (uint8_t*)s_psBufferLcd[2] );
-  
   lcd->swap = lcd_rt1052_swap;
   lcd->begin_frame = lcd_rt1052_begin_frame;
-
+#else
+  lcd = lcd_mem_bgr565_create_double_fb(w, h, (uint8_t*)s_psBufferLcd[0], (uint8_t*)s_psBufferLcd[1] );
+#endif
+  
+  
+  
+  
   return lcd;
 }
 
@@ -400,15 +409,17 @@ lcd_t* rt1052_create_lcd(wh_t w, wh_t h) {
 */
 void LCDIF_IRQHandler(void)
 {
-    ELCDIF_ClearInterruptStatus(LCDIF, ELCDIF_GetInterruptStatus(LCDIF));
+    uint32_t intStatus;
+static uint8_t* online_temp_fb = NULL;
 
-    if (next_fb != NULL) {
-      
-      //交换缓存
-      online_fb  = next_fb;
-
-      ELCDIF_SetNextBufferAddr(LCDIF, (uint32_t)online_fb);//中断最后设置显示fb
-      next_fb = NULL;
+    intStatus = ELCDIF_GetInterruptStatus(LCDIF);
+    ELCDIF_ClearInterruptStatus(LCDIF, intStatus);
+    
+    if (intStatus & kELCDIF_CurFrameDone) {
+      if (next_fb != NULL) {
+        online_fb  = next_fb;
+        next_fb = NULL;
+      }
     }
     
     /* 以下部分是为 ARM 的勘误838869添加的, 该错误影响 Cortex-M4, Cortex-M4F内核， 立即存储覆盖重叠异常，导致返回操作可能会指向错误的中断 CM7不受影响，此处保留该代码 */  

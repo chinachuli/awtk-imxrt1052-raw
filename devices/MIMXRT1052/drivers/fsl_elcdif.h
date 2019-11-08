@@ -83,13 +83,10 @@ enum _elcdif_interrupt_enable
     kELCDIF_BusMasterErrorInterruptEnable  = LCDIF_CTRL1_BM_ERROR_IRQ_EN_MASK,  /*!< Bus master error interrupt. */
     kELCDIF_TxFifoOverflowInterruptEnable  = LCDIF_CTRL1_OVERFLOW_IRQ_EN_MASK,  /*!< TXFIFO overflow interrupt. */
     kELCDIF_TxFifoUnderflowInterruptEnable = LCDIF_CTRL1_UNDERFLOW_IRQ_EN_MASK, /*!< TXFIFO underflow interrupt. */
-    kELCDIF_CurFrameDoneInterruptEnable =
-        LCDIF_CTRL1_CUR_FRAME_DONE_IRQ_EN_MASK, /*!< Interrupt when hardware enters vertical blanking state. */
-    kELCDIF_VsyncEdgeInterruptEnable =
-        LCDIF_CTRL1_VSYNC_EDGE_IRQ_EN_MASK, /*!< Interrupt when hardware encounters VSYNC edge. */
+    kELCDIF_CurFrameDoneInterruptEnable    = LCDIF_CTRL1_CUR_FRAME_DONE_IRQ_EN_MASK, /*!< Interrupt when hardware enters vertical blanking state. */
+    kELCDIF_VsyncEdgeInterruptEnable       = LCDIF_CTRL1_VSYNC_EDGE_IRQ_EN_MASK, /*!< Interrupt when hardware encounters VSYNC edge. */
 #if defined(LCDIF_AS_CTRL_CSI_SYNC_ON_IRQ_EN_MASK)
-    kELCDIF_SciSyncOnInterruptEnable =
-        LCDIF_AS_CTRL_CSI_SYNC_ON_IRQ_EN_MASK, /*!< Interrupt when eLCDIF lock with CSI input. */
+    kELCDIF_SciSyncOnInterruptEnable =  LCDIF_AS_CTRL_CSI_SYNC_ON_IRQ_EN_MASK, /*!< Interrupt when eLCDIF lock with CSI input. */
 #endif
 };
 

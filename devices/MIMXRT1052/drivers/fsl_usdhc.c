@@ -32,7 +32,7 @@
 /* Typedef for interrupt handler. */
 typedef void (*usdhc_isr_t)(USDHC_Type *base, usdhc_handle_t *handle);
 /*! @brief Dummy data buffer for mmc boot mode  */
-AT_NONCACHEABLE_SECTION_ALIGN(uint32_t s_usdhcBootDummy, USDHC_ADMA2_ADDRESS_ALIGN);
+//AT_NONCACHEABLE_SECTION_ALIGN(uint32_t s_usdhcBootDummy, USDHC_ADMA2_ADDRESS_ALIGN);
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/

@@ -398,7 +398,7 @@ void TOUCH_PAD_IRQHANDLER(void)
       GPIO_PortClearInterruptFlags(TOUCH_PAD_INT_GPIO, 1U << TOUCH_PAD_INT_GPIO_PIN);
       /* 切换触摸输入状态标志 */
       g_TouchPadInputSignal = true;
-
+      // GTP_TouchProcess(); 
      }
 
     /* 以下部分是为 ARM 的勘误838869添加的, 

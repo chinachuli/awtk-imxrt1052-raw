@@ -25,12 +25,17 @@
 #include "bsp_systick.h"
 #include "tkc/mem.h"
    
+/* FreeRTOS kernel includes. */
+#include "FreeRTOS.h"
+
 uint64_t get_time_ms64() {
-  return HAL_GetTick();
+ // return HAL_GetTick();
+  return xTaskGetTickCount();
 }
 
 void sleep_ms(uint32_t ms) {
-  delay_ms(ms);
+  vTaskDelay(ms);
+ // delay_ms(ms);
 }
 
 

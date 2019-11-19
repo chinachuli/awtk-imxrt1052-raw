@@ -19,9 +19,10 @@
 #include "gt9xx.h"
 #include "bsp_i2c_touch.h"
 #include "bsp_lcd.h"
+#include "para.h"
 
 // 5寸屏GT9157驱动配置
-const uint8_t CTP_CFG_GT9157[] ={ 
+const uint8_t CTP_CFG_GT9157[] ={
 	0x00,0x20,0x03,0xE0,0x01,0x05,0x3C,0x00,0x01,0x08,
 	0x28,0x0C,0x50,0x32,0x03,0x05,0x00,0x00,0x00,0x00,
 	0x00,0x00,0x00,0x17,0x19,0x1E,0x14,0x8B,0x2B,0x0D,
@@ -70,7 +71,9 @@ const uint8_t CTP_CFG_GT911[] =  {
 uint8_t config[GTP_CONFIG_MAX_LENGTH + GTP_ADDR_LENGTH]
                 = {GTP_REG_CONFIG_DATA >> 8, GTP_REG_CONFIG_DATA & 0xff};
 
-TOUCH_IC touchIC;								
+TOUCH_IC touchIC;
+
+struct touch_msg  touch_date;
 
 static int8_t GTP_I2C_Test(void);
 //static void GT91xx_Config_Read_Proc(void);
@@ -286,13 +289,17 @@ int32_t TP_X,TP_Y;
 
 static void GTP_Touch_Down(int32_t id,int32_t x,int32_t y,int32_t w)
 {
-   TP_X=x;
-   TP_Y=y;
-   
-   GTP_DEBUG_FUNC();
-   /*取x、y初始值大于屏幕像素值*/
-   GTP_DEBUG("ID:%d, X:%d, Y:%d, W:%d", id, x, y, w);
-	
+
+    if( (id==0) && (pre_x[0] != x) && (pre_y[0] != y) ){
+          StructTouchInfo.state=2;
+          StructTouchInfo.x_input=pre_x[0];
+          StructTouchInfo.y_input=pre_y[0];
+          
+          pre_x[id] = x; pre_y[id] =y;
+    }
+
+    
+
 }
 
 
@@ -303,7 +310,9 @@ static void GTP_Touch_Down(int32_t id,int32_t x,int32_t y,int32_t w)
   */
 static void GTP_Touch_Up( int32_t id)
 {
-    GTP_DEBUG("Touch id[%2d] release!", id);
+    if(id==0){
+          StructTouchInfo.state=1;
+    }
 }
 
 
@@ -690,7 +699,7 @@ Output:
 	
 		
 	 /*使能中断，这样才能检测触摸数据*/
-		GTP_IRQEnable();
+		//GTP_IRQEnable();
 	
     GTP_Get_Info();
 
@@ -775,7 +784,6 @@ void GTP_TouchProcess(void)
 {
   GTP_DEBUG_FUNC();
   Goodix_TS_Work_Func();
-
 }
 
 #if 0//没有到的测试函数

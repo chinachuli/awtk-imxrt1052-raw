@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-
+#define  PARA_GLOBALS 
 #include "fsl_device_registers.h"
 #include "fsl_debug_console.h"
 #include "board.h"
@@ -17,8 +17,23 @@
 #include "bsp_i2c_touch.h"
 #include "gt9xx.h"
 #include "bsp_lcd.h" 
+#include "para.h"
+   
+/* FreeRTOS kernel includes. */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "timers.h"
 
 extern int gui_app_start(int lcd_w, int lcd_h);
+
+/* Task priorities. */
+#define awtk_task_PRIORITY (configMAX_PRIORITIES - 1)
+/*******************************************************************************
+ * Prototypes
+ ******************************************************************************/
+static void awtk_task(void *pvParameters);
+
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -26,8 +41,6 @@ extern int gui_app_start(int lcd_w, int lcd_h);
 
 /* LCD背光引脚，高电平点亮 */
 
-#define LCD_WIDTH 800
-#define LCD_HEIGHT 480
 /* Display. */
 #define LCD_DISP_GPIO GPIO1
 #define LCD_DISP_GPIO_PIN 2
@@ -112,8 +125,6 @@ void BOARD_InitLcdifPixelClock(void)
     CLOCK_SetDiv(kCLOCK_LcdifDiv, 1);
 }
 
-
-
 /**
 * @brief  初始化背光引脚并点亮
 * @param  无
@@ -121,7 +132,6 @@ void BOARD_InitLcdifPixelClock(void)
 */
 void LCD_BackLight_ON(void)
 {    
-    /* 背光，高电平点亮 */
     gpio_pin_config_t config = {
       kGPIO_DigitalOutput, 
       1,
@@ -131,9 +141,6 @@ void LCD_BackLight_ON(void)
 }
 
 
-/*!
- * @brief Main function
- */
 int main(void)
 {
     BOARD_ConfigMPU();
@@ -144,15 +151,29 @@ int main(void)
     BOARD_InitDebugConsole();
     fLCD_Init(LCD_INTERRUPT_ENABLE);
     GTP_Init_Panel();
-    SysTick_Init();
-    memset(s_psBufferLcd, 0, sizeof(s_psBufferLcd));
- 
-    PRINTF("awtk demo start.\r\n");
     
-    while (1)
+    if (xTaskCreate(awtk_task, "awtk_task", configMIDDLE_STACK_SIZE , NULL, awtk_task_PRIORITY, NULL) != pdPASS)
     {
-      return gui_app_start(LCD_WIDTH, LCD_HEIGHT);    
+        PRINTF("Task creation failed!.\r\n");
+        while (1)
+            ;
     }
+    vTaskStartScheduler();
+    
+    while (1);
 }
 
+/*!
+ * @brief Task responsible for printing of "Hello world." message.
+ */
+static void awtk_task(void *pvParameters)
+{
+    gui_app_start(LCD_WIDTH, LCD_HEIGHT); 
+    
+    while(1)
+    {
+        PRINTF("AWTK start !.\r\n");
+        vTaskDelay(10);   /* 延时500个tick */
+    }
+}
 

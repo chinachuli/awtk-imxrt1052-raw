@@ -33,12 +33,16 @@
 #include "base/dialog_highlighter_factory.h"
 #include "window_manager/window_manager_default.h"
 
+static ret_t window_manager_invalidate_system_bar(widget_t* widget);
 static ret_t window_manager_default_inc_fps(widget_t* widget);
 static ret_t window_manager_default_update_fps(widget_t* widget);
 static ret_t window_manager_default_invalidate(widget_t* widget, rect_t* r);
+static ret_t window_manager_default_get_client_r(widget_t* widget, rect_t* r);
 static ret_t window_manager_default_do_open_window(widget_t* wm, widget_t* window);
 static ret_t window_manager_default_layout_child(widget_t* widget, widget_t* window);
+static ret_t window_manager_default_layout_system_bar(widget_t* widget, widget_t* window);
 static ret_t window_manager_default_create_dialog_highlighter(widget_t* widget, widget_t* curr_win);
+static ret_t window_manager_default_layout_not_system_bar(widget_t* widget, widget_t* window, rect_t client_r);
 
 static bool_t window_is_fullscreen(widget_t* widget) {
   value_t v;
@@ -130,12 +134,10 @@ static widget_t* window_manager_find_prev_window(widget_t* widget) {
 }
 
 static widget_t* window_manager_find_prev_any_window(widget_t* widget) {
-  int32_t i = 0;
   return_value_if_fail(widget != NULL, NULL);
 
   if (widget->children != NULL && widget->children->size >= 2) {
-    uint32_t i = widget->children->size - 2;
-    return (widget_t*)(widget->children->elms[i]);
+    return (widget_t*)(widget->children->elms[widget->children->size - 2]);
   }
 
   return NULL;
@@ -203,10 +205,6 @@ ret_t window_manager_default_snap_prev_window(widget_t* widget, widget_t* prev_w
   ENSURE(vgcanvas_bind_fbo(vg, fbo) == RET_OK);
   ENSURE(canvas_begin_frame(c, NULL, LCD_DRAW_OFFLINE) == RET_OK);
   ENSURE(widget_on_paint_background(widget, c) == RET_OK);
-  if (wm->system_bar) {
-    widget_paint(wm->system_bar, c);
-  }
-
   window_manager_paint_system_bar(widget, c);
   ENSURE(widget_paint(prev_win, c) == RET_OK);
 
@@ -411,10 +409,6 @@ static ret_t window_manager_default_open_window(widget_t* widget, widget_t* wind
   window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(widget);
   return_value_if_fail(widget != NULL && window != NULL, RET_BAD_PARAMS);
 
-  if (widget_is_system_bar(window)) {
-    return_value_if_fail(wm->system_bar == NULL, RET_BAD_PARAMS);
-  }
-
   wm->prev_win = window_manager_get_top_window(widget);
 
   if (wm->animator != NULL) {
@@ -435,10 +429,6 @@ static ret_t window_manager_default_open_window(widget_t* widget, widget_t* wind
   }
   widget_invalidate(window, NULL);
 
-  if (widget_is_system_bar(window)) {
-    wm->system_bar = window;
-  }
-
   widget_set_prop_pointer(window, WIDGET_PROP_NATIVE_WINDOW, wm->native_window);
   widget_on(window, EVT_DESTROY, wm_on_destroy_child, widget);
   widget_update_style(widget);
@@ -458,7 +448,6 @@ static ret_t window_manager_idle_destroy_window(const idle_info_t* info) {
 }
 
 static ret_t window_manager_prepare_close_window(widget_t* widget, widget_t* window) {
-  window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(widget);
   return_value_if_fail(widget != NULL && window != NULL, RET_BAD_PARAMS);
 
   if (widget->target == window) {
@@ -473,10 +462,6 @@ static ret_t window_manager_prepare_close_window(widget_t* widget, widget_t* win
     if (widget->grab_widget == window) {
       widget->grab_widget = NULL;
     }
-  }
-
-  if (wm->system_bar == window) {
-    wm->system_bar = NULL;
   }
 
   return RET_OK;
@@ -682,9 +667,7 @@ static ret_t window_manager_paint_animation(widget_t* widget, canvas_t* c) {
       window_manager_default_do_open_window(widget, window);
     }
 
-    if (wm->system_bar != NULL) {
-      widget_invalidate_force(wm->system_bar, NULL);
-    }
+    window_manager_invalidate_system_bar(widget);
   }
 
   return RET_OK;
@@ -795,7 +778,7 @@ static ret_t window_manager_default_on_paint_children(widget_t* widget, canvas_t
   /*paint dialog and other*/
   WIDGET_FOR_EACH_CHILD_BEGIN(widget, iter, i)
   if (i >= start && iter->visible) {
-    if (wm->system_bar != iter && !widget_is_normal_window(iter)) {
+    if (!widget_is_system_bar(iter) && !widget_is_normal_window(iter)) {
       widget_paint(iter, c);
     }
   }
@@ -851,10 +834,21 @@ static ret_t window_manager_default_on_destroy(widget_t* widget) {
 }
 
 static ret_t window_manager_default_on_layout_children(widget_t* widget) {
+  rect_t client_r = rect_init(0, 0, widget->w, widget->h);
   return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
 
   WIDGET_FOR_EACH_CHILD_BEGIN(widget, iter, i)
-  window_manager_default_layout_child(widget, iter);
+  if (widget_is_system_bar(iter)) {
+    window_manager_default_layout_system_bar(widget, iter);
+  }
+  WIDGET_FOR_EACH_CHILD_END();
+
+  window_manager_default_get_client_r(widget, &client_r);
+
+  WIDGET_FOR_EACH_CHILD_BEGIN(widget, iter, i)
+  if (!widget_is_system_bar(iter)) {
+    window_manager_default_layout_not_system_bar(widget, iter, client_r);
+  }
   WIDGET_FOR_EACH_CHILD_END();
 
   return RET_OK;
@@ -912,18 +906,50 @@ ret_t window_manager_default_on_event(widget_t* widget, event_t* e) {
   return RET_OK;
 }
 
-static ret_t window_manager_default_layout_child(widget_t* widget, widget_t* window) {
+static bool_t widget_is_system_bar_top(widget_t* window) {
+  return tk_str_eq(window->vt->type, WIDGET_TYPE_SYSTEM_BAR);
+}
+
+static bool_t widget_is_system_bar_bottom(widget_t* window) {
+  return tk_str_eq(window->vt->type, WIDGET_TYPE_SYSTEM_BAR_BOTTOM);
+}
+
+static ret_t window_manager_default_get_client_r(widget_t* widget, rect_t* r) {
+  *r = rect_init(0, 0, widget->w, widget->h);
+
+  WIDGET_FOR_EACH_CHILD_BEGIN(widget, iter, i)
+  if (widget_is_system_bar_top(iter)) {
+    r->y = iter->h;
+    r->h -= iter->h;
+  }
+
+  if (widget_is_system_bar_bottom(iter)) {
+    r->h -= iter->h;
+  }
+  WIDGET_FOR_EACH_CHILD_END();
+
+  return RET_OK;
+}
+
+static ret_t window_manager_default_layout_system_bar(widget_t* widget, widget_t* window) {
+  window->x = 0;
+  window->w = widget->w;
+
+  if (widget_is_system_bar_bottom(window)) {
+    window->y = widget->h - window->h;
+  }
+
+  widget_layout(window);
+
+  return RET_OK;
+}
+
+static ret_t window_manager_default_layout_not_system_bar(widget_t* widget, widget_t* window,
+                                                          rect_t client_r) {
   xy_t x = window->x;
   xy_t y = window->y;
   wh_t w = window->w;
   wh_t h = window->h;
-  window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(widget);
-  rect_t client_r = rect_init(0, 0, widget->w, widget->h);
-
-  if (wm->system_bar != NULL) {
-    widget_t* bar = wm->system_bar;
-    client_r = rect_init(0, bar->h, widget->w, widget->h - bar->h);
-  }
 
   if (widget_is_normal_window(window)) {
     if (window_is_fullscreen(window)) {
@@ -937,10 +963,6 @@ static ret_t window_manager_default_layout_child(widget_t* widget, widget_t* win
       w = client_r.w;
       h = client_r.h;
     }
-  } else if (widget_is_system_bar(window)) {
-    x = 0;
-    y = 0;
-    w = widget->w;
   } else if (widget_is_dialog(window)) {
     x = (widget->w - window->w) >> 1;
     y = (widget->h - window->h) >> 1;
@@ -955,6 +977,16 @@ static ret_t window_manager_default_layout_child(widget_t* widget, widget_t* win
   widget_layout(window);
 
   return RET_OK;
+}
+
+static ret_t window_manager_default_layout_child(widget_t* widget, widget_t* window) {
+  if (widget_is_system_bar(window)) {
+    return window_manager_default_layout_system_bar(widget, window);
+  } else {
+    rect_t client_r = rect_init(0, 0, widget->w, widget->h);
+    window_manager_default_get_client_r(widget, &client_r);
+    return window_manager_default_layout_not_system_bar(widget, window, client_r);
+  }
 }
 
 static ret_t window_manager_default_resize(widget_t* widget, wh_t w, wh_t h) {
@@ -1056,9 +1088,24 @@ ret_t window_manager_paint_system_bar(widget_t* widget, canvas_t* c) {
   window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(widget);
   return_value_if_fail(wm != NULL && c != NULL, RET_BAD_PARAMS);
 
-  if (wm->system_bar != NULL && wm->system_bar->visible) {
-    widget_paint(wm->system_bar, c);
+  WIDGET_FOR_EACH_CHILD_BEGIN_R(widget, iter, i)
+  if (widget_is_system_bar(iter)) {
+    widget_paint(iter, c);
   }
+  WIDGET_FOR_EACH_CHILD_END()
+
+  return RET_OK;
+}
+
+static ret_t window_manager_invalidate_system_bar(widget_t* widget) {
+  window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(widget);
+  return_value_if_fail(wm != NULL, RET_BAD_PARAMS);
+
+  WIDGET_FOR_EACH_CHILD_BEGIN_R(widget, iter, i)
+  if (widget_is_system_bar(iter)) {
+    widget_invalidate_force(iter, NULL);
+  }
+  WIDGET_FOR_EACH_CHILD_END()
 
   return RET_OK;
 }

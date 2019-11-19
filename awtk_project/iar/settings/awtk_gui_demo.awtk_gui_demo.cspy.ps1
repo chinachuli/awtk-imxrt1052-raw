@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.1\common\bin\cspybat" -f "D:\awtk-imxrt1052-raw\awtk_project\iar\settings\awtk_gui_demo.awtk_gui_demo.general.xcl" --backend -f "D:\awtk-imxrt1052-raw\awtk_project\iar\settings\awtk_gui_demo.awtk_gui_demo.driver.xcl" 
+& "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "J:\git_project\awtk-imxrt1052-raw-github\awtk-imxrt1052-raw\awtk_project\iar\settings\awtk_gui_demo.awtk_gui_demo.general.xcl" --backend -f "J:\git_project\awtk-imxrt1052-raw-github\awtk-imxrt1052-raw\awtk_project\iar\settings\awtk_gui_demo.awtk_gui_demo.driver.xcl" 
 }
 else
 {
-& "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.1\common\bin\cspybat" -f "D:\awtk-imxrt1052-raw\awtk_project\iar\settings\awtk_gui_demo.awtk_gui_demo.general.xcl" --debug_file=$debugfile --backend -f "D:\awtk-imxrt1052-raw\awtk_project\iar\settings\awtk_gui_demo.awtk_gui_demo.driver.xcl" 
+& "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "J:\git_project\awtk-imxrt1052-raw-github\awtk-imxrt1052-raw\awtk_project\iar\settings\awtk_gui_demo.awtk_gui_demo.general.xcl" --debug_file=$debugfile --backend -f "J:\git_project\awtk-imxrt1052-raw-github\awtk-imxrt1052-raw\awtk_project\iar\settings\awtk_gui_demo.awtk_gui_demo.driver.xcl" 
 }

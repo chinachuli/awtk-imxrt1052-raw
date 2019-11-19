@@ -6,3 +6,7 @@
 2019/11/8   V1.1   chinachuli@163.com
            1：AWTK 版本  2019/10/30  (commit: 47fa66662e70eb5076aea4e982b306c877a2c040)
            2：增加3bf模式，通过宏定义 USE_THREE_FB  选择是否用3bf模式(建议开启3bf,有助于提高帧率)
+
+2019/11/19   V1.1   chinachuli@163.com
+           1：AWTK 版本  2019/10/30  (commit: 47fa66662e70eb5076aea4e982b306c877a2c040)
+           2：增加awtk_sdram_debug调试模式，移植freertos

@@ -6,4 +6,5 @@
 *.pbd
 *.pbd.browse
 /awtk_project/iar/awtk_gui_demo/Obj
+/awtk_project/iar/awtk_sdram_debug/Obj
 

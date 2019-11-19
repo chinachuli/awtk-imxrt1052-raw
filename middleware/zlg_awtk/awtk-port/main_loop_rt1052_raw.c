@@ -25,17 +25,16 @@
 #include "base/timer.h"
 #include "main_loop/main_loop_simple.h"
 #include "bsp_i2c_touch.h"
+#include "para.h"
 
-extern int32_t TP_X,TP_Y;
+extern void GTP_TouchProcess(void);
+
 uint8_t platform_disaptch_input(main_loop_t* loop) {
-  
-  
-  if (g_TouchPadInputSignal) {//触摸中断中有按下后有置位
-     GTP_TouchProcess();    
-     g_TouchPadInputSignal = false;
-    main_loop_post_pointer_event(loop, TRUE, TP_X, TP_Y);//只有按下时才进
-  } else {
-    main_loop_post_pointer_event(loop, FALSE, TP_X, TP_Y);//不触摸时都进
+      
+  GTP_TouchProcess();
+  if(StructTouchInfo.state>0) {//触摸中断中有按下后有置位
+    main_loop_post_pointer_event(loop, StructTouchInfo.state-1, StructTouchInfo.x_input, StructTouchInfo.y_input);//不触摸时都进
+    StructTouchInfo.state=0;
   }
 
   return 0;

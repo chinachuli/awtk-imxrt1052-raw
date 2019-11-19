@@ -13,22 +13,22 @@
     </Stack>
     <PlDriver>
         <FirstRun>0</FirstRun>
-        <MemConfigValue>D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.1\arm\CONFIG\debugger\NXP\MIMXRT1052xxx6B.ddf</MemConfigValue>
+        <MemConfigValue>D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\CONFIG\debugger\NXP\MIMXRT1052xxx6B.ddf</MemConfigValue>
     </PlDriver>
     <Jet>
-        <JetConnSerialNo>Fire CMSIS-DAP:FS-00000001</JetConnSerialNo>
+        <JetConnSerialNo>ATK CMSIS-DAP-Debugger:ATK 05022018</JetConnSerialNo>
         <JetConnFoundProbes />
         <PrevWtdReset>Hardware</PrevWtdReset>
-        <OnlineReset>Software</OnlineReset>
         <DisableInterrupts>0</DisableInterrupts>
         <LeaveRunning>0</LeaveRunning>
         <MultiCoreRunAll>0</MultiCoreRunAll>
+        <OnlineReset>Software</OnlineReset>
     </Jet>
     <ArmDriver>
         <EnableCache>1</EnableCache>
     </ArmDriver>
     <DebugChecksum>
-        <Checksum>289742665</Checksum>
+        <Checksum>1517051357</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -43,7 +43,7 @@
     <SWOManager>
         <SamplingDivider>8192</SamplingDivider>
         <OverrideClock>0</OverrideClock>
-        <CpuClock>0</CpuClock>
+        <CpuClock>1487768</CpuClock>
         <SwoClock>0</SwoClock>
         <DataLogMode>0</DataLogMode>
         <ItmPortsEnabled>63</ItmPortsEnabled>
@@ -87,22 +87,23 @@
         <LoggingEnabled>_ 0</LoggingEnabled>
         <LogFile>_ ""</LogFile>
     </TermIOLog>
+    <DisassembleMode>
+        <mode>0</mode>
+    </DisassembleMode>
+    <Breakpoints2>
+        <Count>0</Count>
+    </Breakpoints2>
     <LogFile>
         <LoggingEnabled>_ 0</LoggingEnabled>
         <LogFile>_ ""</LogFile>
         <Category>_ 0</Category>
     </LogFile>
-    <DisassembleMode>
-        <mode>0</mode>
-    </DisassembleMode>
-    <Breakpoints2>
-        <Bp0>_ 0 "EMUL_DATA" "s_psBufferLcd[0]" 2 0 0 0 4294967295</Bp0>
-        <Bp1>_ 0 "EMUL_DATA" "s_psBufferLcd[1]" 2 0 0 0 4294967295</Bp1>
-        <Bp2>_ 0 "EMUL_DATA" "s_psBufferLcd[2]" 2 0 0 0 4294967295</Bp2>
-        <Count>3</Count>
-    </Breakpoints2>
     <Aliases>
-        <Count>0</Count>
+        <A0>_ "D:\awtk-imxrt1052-raw\awtk_project\main.c" ""</A0>
+        <A1>_ "D:\awtk-imxrt1052-raw\devices\MIMXRT1052\drivers\fsl_clock.c" ""</A1>
+        <A2>_ "D:\awtk-imxrt1052-raw\middleware\zlg_awtk\awtk\src\blend\pixel_ops.inc" ""</A2>
+        <A3>_ "D:\awtk-imxrt1052-raw\middleware\zlg_awtk\awtk\src\lcd\lcd_mem.inc" ""</A3>
+        <Count>4</Count>
         <SuppressDialog>0</SuppressDialog>
     </Aliases>
 </settings>

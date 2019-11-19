@@ -75,11 +75,11 @@ void delay_ms(uint32_t ms) {
   }
 }
 
-
+/*
 void SysTick_Handler(void){
   systick_count++;
 }
-
+*/
 
 #if 0
 // SysTick_Config在 core_cm7.h中实现

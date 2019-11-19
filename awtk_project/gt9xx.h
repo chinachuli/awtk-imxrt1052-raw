@@ -57,6 +57,12 @@ typedef enum
 	GT911=1,
 }TOUCH_IC;
 
+struct touch_msg {
+	uint8_t state;	    //0:未按下  //1：up    //2:down
+	uint16_t x_input;   /*控制标志*/
+	uint16_t y_input;   /*读写数据的长度			*/
+};
+
 
 //以下配置已改成数组，在c文件中
 //*************************** PART2:TODO define **********************************
